@@ -1,49 +1,48 @@
-﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
+﻿using System.Collections.Generic;
+using Academia_Programador_GestaoEquipamentosFabricantes.Compartilhado;
+using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
 {
-    public class RepositorioEquipamento
+    public class RepositorioEquipamentos : IRepositorio<Equipamento>
     {
-        private static List<Equipamento> listaEquipamentos = new List<Equipamento>();
-        private static int contadorId = 1;
+        private List<Equipamento> equipamentos = new List<Equipamento>();
 
-        public static void Adicionar(Equipamento equipamento)
+        public void Cadastrar(Equipamento entidade)
         {
-            equipamento.Id = contadorId++;
-            listaEquipamentos.Add(equipamento);
+            equipamentos.Add(entidade);
         }
 
-        public static List<Equipamento> ObterTodos()
+        public void Editar(int id, Equipamento entidadeAtualizada)
         {
-            return listaEquipamentos;
-        }
-
-        public static Equipamento ObterPorId(int id)
-        {
-            return listaEquipamentos.FirstOrDefault(e => e.Id == id);
-        }
-
-        public static void Editar(int id, string novoNome, decimal novoPreco, string novoNumeroSerie, DateTime novaData, string novoFabricante)
-        {
-            Equipamento equipamento = ObterPorId(id);
-            if (equipamento != null)
+            Equipamento equipamentoExistente = SelecionarPorId(id);
+            if (equipamentoExistente != null)
             {
-                equipamento.Nome = novoNome;
-                equipamento.Preco = novoPreco;
-                equipamento.NumeroSerie = novoNumeroSerie;
-                equipamento.DataFabricacao = novaData;
-                equipamento.Fabricante = novoFabricante;
+                equipamentoExistente.Nome = entidadeAtualizada.Nome;
+                equipamentoExistente.Preco = entidadeAtualizada.Preco;
+                equipamentoExistente.NumeroSerie = entidadeAtualizada.NumeroSerie;
+                equipamentoExistente.DataFabricacao = entidadeAtualizada.DataFabricacao;
+                equipamentoExistente.Fabricante = entidadeAtualizada.Fabricante;
             }
         }
 
-        public static void Remover(int id)
+        public void Excluir(int id)
         {
-            Equipamento equipamento = ObterPorId(id);
-            if (equipamento != null)
-            {
-                listaEquipamentos.Remove(equipamento);
-            }
+            Equipamento equipamentoExistente = SelecionarPorId(id);
+            if (equipamentoExistente != null)
+                equipamentos.Remove(equipamentoExistente);
+        }
+
+        public List<Equipamento> ListarTodos()
+        {
+            return new List<Equipamento>(equipamentos);
+        }
+
+        public Equipamento SelecionarPorId(int id)
+        {
+            return equipamentos.Find(e => e.Id == id);
         }
     }
 }
+
 

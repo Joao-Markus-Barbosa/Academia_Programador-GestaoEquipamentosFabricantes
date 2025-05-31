@@ -1,10 +1,14 @@
 ﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado;
 using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
+using System;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
 {
     public class TelaChamado
     {
+        private static RepositorioChamado repositorio = new RepositorioChamado();
+        private static RepositorioEquipamentos repositorioEquipamentos = new RepositorioEquipamentos();
+
         public static void MostrarMenu()
         {
             while (true)
@@ -26,7 +30,12 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
                     case "3": Editar(); break;
                     case "4": Excluir(); break;
                     case "0": return;
-                    default: Console.WriteLine("Opção inválida. Pressione Enter para continuar."); Console.ReadLine(); break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Opção inválida.");
+                        Console.ResetColor();
+                        Console.ReadLine();
+                        break;
                 }
             }
         }
@@ -36,36 +45,46 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
             Console.Clear();
             Console.WriteLine("---- Cadastro de Chamado ----");
 
-            Console.Write("Título: ");
-            string titulo = Console.ReadLine();
-
-            Console.Write("Descrição: ");
-            string descricao = Console.ReadLine();
-
-            Console.WriteLine("Escolha o equipamento pelo ID:");
-            var equipamentos = RepositorioEquipamento.ObterTodos();
-            foreach (var e in equipamentos)
+            try
             {
-                Console.WriteLine($"ID: {e.Id} | Nome: {e.Nome}");
+                Console.Write("Título: ");
+                string titulo = Console.ReadLine();
+
+                Console.Write("Descrição: ");
+                string descricao = Console.ReadLine();
+
+                var equipamentos = repositorioEquipamentos.ListarTodos();
+                if (equipamentos.Count == 0)
+                    throw new Exception("Nenhum equipamento disponível.");
+
+                Console.WriteLine("Escolha o equipamento pelo ID:");
+                foreach (var e in equipamentos)
+                    Console.WriteLine($"ID: {e.Id} | Nome: {e.Nome}");
+
+                Console.Write("ID do Equipamento: ");
+                int idEquipamento = int.Parse(Console.ReadLine());
+                Equipamento equipamentoEscolhido = repositorioEquipamentos.SelecionarPorId(idEquipamento);
+
+                if (equipamentoEscolhido == null)
+                    throw new Exception("Equipamento não encontrado.");
+
+                Console.Write("Data de abertura (dd/MM/yyyy): ");
+                DateTime dataAbertura = DateTime.Parse(Console.ReadLine());
+
+                int novoId = GerarNovoId();
+                Chamado chamado = new Chamado(novoId, titulo, descricao, equipamentoEscolhido, dataAbertura);
+                repositorio.Cadastrar(chamado);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Chamado cadastrado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
             }
 
-            int idEquipamento = int.Parse(Console.ReadLine());
-            Equipamento equipamentoEscolhido = RepositorioEquipamento.ObterPorId(idEquipamento);
-
-            if (equipamentoEscolhido == null)
-            {
-                Console.WriteLine("Equipamento não encontrado.");
-                Console.ReadLine();
-                return;
-            }
-
-            Console.Write("Data de abertura (dd/MM/yyyy): ");
-            DateTime dataAbertura = DateTime.Parse(Console.ReadLine());
-
-            Chamado novoChamado = new Chamado(0, titulo, descricao, equipamentoEscolhido, dataAbertura);
-            RepositorioChamado.Adicionar(novoChamado);
-
-            Console.WriteLine("Chamado cadastrado com sucesso!");
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -74,18 +93,15 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
             Console.Clear();
             Console.WriteLine("---- Lista de Chamados ----");
 
-            var chamados = RepositorioChamado.ObterTodos();
-
-            if (chamados.Count == 0)
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0)
             {
                 Console.WriteLine("Nenhum chamado cadastrado.");
             }
             else
             {
-                foreach (var c in chamados)
-                {
-                    Console.WriteLine($"ID: {c.Id} | Título: {c.Titulo} | Equipamento: {c.Equipamento.Nome} | Abertura: {c.DataAbertura.ToShortDateString()} | Dias em aberto: {c.DiasEmAberto()}");
-                }
+                foreach (var c in lista)
+                    c.ExibirInformacoes();
             }
 
             Console.ReadLine();
@@ -97,38 +113,48 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
             Console.WriteLine("---- Edição de Chamado ----");
             Listar();
 
-            Console.Write("Digite o ID do chamado que deseja editar: ");
-            int id = int.Parse(Console.ReadLine());
-
-            Console.Write("Novo Título: ");
-            string titulo = Console.ReadLine();
-
-            Console.Write("Nova Descrição: ");
-            string descricao = Console.ReadLine();
-
-            Console.WriteLine("Escolha o novo equipamento pelo ID:");
-            var equipamentos = RepositorioEquipamento.ObterTodos();
-            foreach (var e in equipamentos)
+            try
             {
-                Console.WriteLine($"ID: {e.Id} | Nome: {e.Nome}");
+                Console.Write("Digite o ID do chamado que deseja editar: ");
+                int id = int.Parse(Console.ReadLine());
+
+                Console.Write("Novo Título: ");
+                string titulo = Console.ReadLine();
+
+                Console.Write("Nova Descrição: ");
+                string descricao = Console.ReadLine();
+
+                var equipamentos = repositorioEquipamentos.ListarTodos();
+                if (equipamentos.Count == 0)
+                    throw new Exception("Nenhum equipamento disponível.");
+
+                Console.WriteLine("Escolha o novo equipamento pelo ID:");
+                foreach (var e in equipamentos)
+                    Console.WriteLine($"ID: {e.Id} | Nome: {e.Nome}");
+
+                Console.Write("ID do Equipamento: ");
+                int idEquipamento = int.Parse(Console.ReadLine());
+                Equipamento equipamentoEscolhido = repositorioEquipamentos.SelecionarPorId(idEquipamento);
+
+                if (equipamentoEscolhido == null)
+                    throw new Exception("Equipamento não encontrado.");
+
+                Console.Write("Nova Data de abertura (dd/MM/yyyy): ");
+                DateTime dataAbertura = DateTime.Parse(Console.ReadLine());
+
+                Chamado chamadoAtualizado = new Chamado(id, titulo, descricao, equipamentoEscolhido, dataAbertura);
+                repositorio.Editar(id, chamadoAtualizado);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Chamado atualizado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
             }
 
-            int idEquipamento = int.Parse(Console.ReadLine());
-            Equipamento equipamentoEscolhido = RepositorioEquipamento.ObterPorId(idEquipamento);
-
-            if (equipamentoEscolhido == null)
-            {
-                Console.WriteLine("Equipamento não encontrado.");
-                Console.ReadLine();
-                return;
-            }
-
-            Console.Write("Nova Data de abertura (dd/MM/yyyy): ");
-            DateTime dataAbertura = DateTime.Parse(Console.ReadLine());
-
-            RepositorioChamado.Editar(id, titulo, descricao, equipamentoEscolhido, dataAbertura);
-
-            Console.WriteLine("Chamado atualizado com sucesso!");
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -138,13 +164,31 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
             Console.WriteLine("---- Exclusão de Chamado ----");
             Listar();
 
-            Console.Write("Digite o ID do chamado que deseja excluir: ");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.Write("Digite o ID do chamado que deseja excluir: ");
+                int id = int.Parse(Console.ReadLine());
 
-            RepositorioChamado.Remover(id);
+                repositorio.Excluir(id);
 
-            Console.WriteLine("Chamado removido com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Chamado removido com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
+        }
+
+        private static int GerarNovoId()
+        {
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0) return 1;
+            return lista[^1].Id + 1;
         }
     }
 }

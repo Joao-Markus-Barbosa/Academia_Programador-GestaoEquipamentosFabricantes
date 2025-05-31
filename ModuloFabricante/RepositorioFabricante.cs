@@ -1,51 +1,43 @@
-﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
+﻿using System.Collections.Generic;
+using Academia_Programador_GestaoEquipamentosFabricantes.Compartilhado;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
 {
-    public class RepositorioFabricante
+    public class RepositorioFabricante : IRepositorio<Fabricante>
     {
-        private static List<Fabricante> listaFabricantes = new List<Fabricante>();
-        private static int contadorId = 1;
+        private List<Fabricante> fabricantes = new List<Fabricante>();
 
-        public static void Adicionar(Fabricante fabricante)
+        public void Cadastrar(Fabricante entidade)
         {
-            fabricante.Id = contadorId++;
-            listaFabricantes.Add(fabricante);
+            fabricantes.Add(entidade);
         }
 
-        public static List<Fabricante> ObterTodos()
+        public void Editar(int id, Fabricante entidadeAtualizada)
         {
-            return listaFabricantes;
-        }
-
-        public static Fabricante ObterPorId(int id)
-        {
-            return listaFabricantes.FirstOrDefault(f => f.Id == id);
-        }
-
-        public static void Editar(int id, string novoNome, string novoEmail, string novoTelefone)
-        {
-            Fabricante fabricante = ObterPorId(id);
-            if (fabricante != null)
+            Fabricante fabricanteExistente = SelecionarPorId(id);
+            if (fabricanteExistente != null)
             {
-                fabricante.Nome = novoNome;
-                fabricante.Email = novoEmail;
-                fabricante.Telefone = novoTelefone;
+                fabricanteExistente.Nome = entidadeAtualizada.Nome;
+                fabricanteExistente.Email = entidadeAtualizada.Email;
+                fabricanteExistente.Telefone = entidadeAtualizada.Telefone;
             }
         }
 
-        public static void Remover(int id)
+        public void Excluir(int id)
         {
-            Fabricante fabricante = ObterPorId(id);
-            if (fabricante != null)
-            {
-                listaFabricantes.Remove(fabricante);
-            }
+            Fabricante fabricanteExistente = SelecionarPorId(id);
+            if (fabricanteExistente != null)
+                fabricantes.Remove(fabricanteExistente);
         }
 
-        public static int ContarEquipamentosDoFabricante(string nomeFabricante, List<Equipamento> equipamentos)
+        public List<Fabricante> ListarTodos()
         {
-            return equipamentos.Count(e => e.Fabricante == nomeFabricante);
+            return new List<Fabricante>(fabricantes);
+        }
+
+        public Fabricante SelecionarPorId(int id)
+        {
+            return fabricantes.Find(f => f.Id == id);
         }
     }
 }

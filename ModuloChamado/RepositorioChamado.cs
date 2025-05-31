@@ -1,49 +1,47 @@
-﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado;
-using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
+﻿using System.Collections.Generic;
+using Academia_Programador_GestaoEquipamentosFabricantes.Compartilhado;
+using Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloChamado
 {
-    public class RepositorioChamado
+    public class RepositorioChamado : IRepositorio<Chamado>
     {
-        private static List<Chamado> listaChamados = new List<Chamado>();
-        private static int contadorId = 1;
+        private List<Chamado> chamados = new List<Chamado>();
 
-        public static void Adicionar(Chamado chamado)
+        public void Cadastrar(Chamado entidade)
         {
-            chamado.Id = contadorId++;
-            listaChamados.Add(chamado);
+            chamados.Add(entidade);
         }
 
-        public static List<Chamado> ObterTodos()
+        public void Editar(int id, Chamado entidadeAtualizada)
         {
-            return listaChamados;
-        }
-
-        public static Chamado ObterPorId(int id)
-        {
-            return listaChamados.FirstOrDefault(c => c.Id == id);
-        }
-
-        public static void Editar(int id, string novoTitulo, string novaDescricao, Equipamento novoEquipamento, DateTime novaDataAbertura)
-        {
-            Chamado chamado = ObterPorId(id);
-            if (chamado != null)
+            Chamado chamadoExistente = SelecionarPorId(id);
+            if (chamadoExistente != null)
             {
-                chamado.Titulo = novoTitulo;
-                chamado.Descricao = novaDescricao;
-                chamado.Equipamento = novoEquipamento;
-                chamado.DataAbertura = novaDataAbertura;
+                chamadoExistente.Titulo = entidadeAtualizada.Titulo;
+                chamadoExistente.Descricao = entidadeAtualizada.Descricao;
+                chamadoExistente.Equipamento = entidadeAtualizada.Equipamento;
+                chamadoExistente.DataAbertura = entidadeAtualizada.DataAbertura;
             }
         }
 
-        public static void Remover(int id)
+        public void Excluir(int id)
         {
-            Chamado chamado = ObterPorId(id);
-            if (chamado != null)
-            {
-                listaChamados.Remove(chamado);
-            }
+            Chamado chamadoExistente = SelecionarPorId(id);
+            if (chamadoExistente != null)
+                chamados.Remove(chamadoExistente);
+        }
+
+        public List<Chamado> ListarTodos()
+        {
+            return new List<Chamado>(chamados);
+        }
+
+        public Chamado SelecionarPorId(int id)
+        {
+            return chamados.Find(c => c.Id == id);
         }
     }
 }
+
 

@@ -1,10 +1,13 @@
 ﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante;
 using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
+using System;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
 {
     public class TelaFabricante
     {
+        private static RepositorioFabricante repositorio = new RepositorioFabricante();
+
         public static void MostrarMenu()
         {
             while (true)
@@ -26,7 +29,12 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
                     case "3": Editar(); break;
                     case "4": Excluir(); break;
                     case "0": return;
-                    default: Console.WriteLine("Opção inválida. Pressione Enter para continuar."); Console.ReadLine(); break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Opção inválida.");
+                        Console.ResetColor();
+                        Console.ReadLine();
+                        break;
                 }
             }
         }
@@ -36,19 +44,31 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
             Console.Clear();
             Console.WriteLine("---- Cadastro de Fabricante ----");
 
-            Console.Write("Nome: ");
-            string nome = Console.ReadLine();
+            try
+            {
+                Console.Write("Nome: ");
+                string nome = Console.ReadLine();
 
-            Console.Write("Email: ");
-            string email = Console.ReadLine();
+                Console.Write("Email: ");
+                string email = Console.ReadLine();
 
-            Console.Write("Telefone: ");
-            string telefone = Console.ReadLine();
+                Console.Write("Telefone: ");
+                string telefone = Console.ReadLine();
 
-            Fabricante novoFabricante = new Fabricante(0, nome, email, telefone);
-            RepositorioFabricante.Adicionar(novoFabricante);
+                int novoId = GerarNovoId();
+                Fabricante novoFabricante = new Fabricante(novoId, nome, email, telefone);
+                repositorio.Cadastrar(novoFabricante);
 
-            Console.WriteLine("Fabricante cadastrado com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Fabricante cadastrado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -57,20 +77,15 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
             Console.Clear();
             Console.WriteLine("---- Lista de Fabricantes ----");
 
-            var fabricantes = RepositorioFabricante.ObterTodos();
-            var equipamentos = RepositorioEquipamento.ObterTodos();
-
-            if (fabricantes.Count == 0)
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0)
             {
                 Console.WriteLine("Nenhum fabricante cadastrado.");
             }
             else
             {
-                foreach (var f in fabricantes)
-                {
-                    int totalEquipamentos = RepositorioFabricante.ContarEquipamentosDoFabricante(f.Nome, equipamentos);
-                    Console.WriteLine($"ID: {f.Id} | Nome: {f.Nome} | Email: {f.Email} | Telefone: {f.Telefone} | Qtde Equipamentos: {totalEquipamentos}");
-                }
+                foreach (var f in lista)
+                    f.ExibirInformacoes();
             }
 
             Console.ReadLine();
@@ -82,21 +97,33 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
             Console.WriteLine("---- Edição de Fabricante ----");
             Listar();
 
-            Console.Write("Digite o ID do fabricante que deseja editar: ");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.Write("Digite o ID do fabricante que deseja editar: ");
+                int id = int.Parse(Console.ReadLine());
 
-            Console.Write("Novo Nome: ");
-            string novoNome = Console.ReadLine();
+                Console.Write("Novo Nome: ");
+                string novoNome = Console.ReadLine();
 
-            Console.Write("Novo Email: ");
-            string novoEmail = Console.ReadLine();
+                Console.Write("Novo Email: ");
+                string novoEmail = Console.ReadLine();
 
-            Console.Write("Novo Telefone: ");
-            string novoTelefone = Console.ReadLine();
+                Console.Write("Novo Telefone: ");
+                string novoTelefone = Console.ReadLine();
 
-            RepositorioFabricante.Editar(id, novoNome, novoEmail, novoTelefone);
+                Fabricante fabricanteAtualizado = new Fabricante(id, novoNome, novoEmail, novoTelefone);
+                repositorio.Editar(id, fabricanteAtualizado);
 
-            Console.WriteLine("Fabricante atualizado com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Fabricante atualizado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -106,13 +133,31 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante
             Console.WriteLine("---- Exclusão de Fabricante ----");
             Listar();
 
-            Console.Write("Digite o ID do fabricante que deseja excluir: ");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.Write("Digite o ID do fabricante que deseja excluir: ");
+                int id = int.Parse(Console.ReadLine());
 
-            RepositorioFabricante.Remover(id);
+                repositorio.Excluir(id);
 
-            Console.WriteLine("Fabricante removido com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Fabricante removido com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
+        }
+
+        private static int GerarNovoId()
+        {
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0) return 1;
+            return lista[^1].Id + 1;
         }
     }
 }

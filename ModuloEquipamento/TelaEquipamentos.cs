@@ -1,10 +1,12 @@
 ﻿using Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento;
-using Academia_Programador_GestaoEquipamentosFabricantes.ModuloFabricante;
+using System;
 
 namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
 {
     public class TelaEquipamento
     {
+        private static RepositorioEquipamentos repositorio = new RepositorioEquipamentos();
+
         public static void MostrarMenu()
         {
             while (true)
@@ -26,7 +28,12 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
                     case "3": Editar(); break;
                     case "4": Excluir(); break;
                     case "0": return;
-                    default: Console.WriteLine("Opção inválida. Pressione Enter para continuar."); Console.ReadLine(); break;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine("Opção inválida.");
+                        Console.ResetColor();
+                        Console.ReadLine();
+                        break;
                 }
             }
         }
@@ -36,31 +43,37 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
             Console.Clear();
             Console.WriteLine("---- Cadastro de Equipamento ----");
 
-            Console.Write("Nome (mínimo 6 caracteres): ");
-            string nome = Console.ReadLine();
-            if (nome.Length < 6)
+            try
             {
-                Console.WriteLine("Nome deve ter no mínimo 6 caracteres.");
-                Console.ReadLine();
-                return;
+                Console.Write("Nome: ");
+                string nome = Console.ReadLine();
+
+                Console.Write("Preço de aquisição: ");
+                decimal preco = decimal.Parse(Console.ReadLine());
+
+                Console.Write("Número de série: ");
+                string numeroSerie = Console.ReadLine();
+
+                Console.Write("Data de fabricação (dd/MM/yyyy): ");
+                DateTime dataFabricacao = DateTime.Parse(Console.ReadLine());
+
+                Console.Write("Fabricante: ");
+                string fabricante = Console.ReadLine();
+
+                int novoId = GerarNovoId();
+                Equipamento novo = new Equipamento(novoId, nome, preco, numeroSerie, dataFabricacao, fabricante);
+                repositorio.Cadastrar(novo);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Equipamento cadastrado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
             }
 
-            Console.Write("Preço de aquisição: ");
-            decimal preco = decimal.Parse(Console.ReadLine());
-
-            Console.Write("Número de série: ");
-            string numeroSerie = Console.ReadLine();
-
-            Console.Write("Data de fabricação (dd/MM/yyyy): ");
-            DateTime dataFabricacao = DateTime.Parse(Console.ReadLine());
-
-            Console.Write("Fabricante: ");
-            string fabricante = Console.ReadLine();
-
-            Equipamento novoEquipamento = new Equipamento(0, nome, preco, numeroSerie, dataFabricacao, fabricante);
-            RepositorioEquipamento.Adicionar(novoEquipamento);
-
-            Console.WriteLine("Equipamento cadastrado com sucesso!");
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -69,18 +82,15 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
             Console.Clear();
             Console.WriteLine("---- Lista de Equipamentos ----");
 
-            var equipamentos = RepositorioEquipamento.ObterTodos();
-
-            if (equipamentos.Count == 0)
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0)
             {
                 Console.WriteLine("Nenhum equipamento cadastrado.");
             }
             else
             {
-                foreach (var e in equipamentos)
-                {
-                    Console.WriteLine($"ID: {e.Id} | Nome: {e.Nome} | Preço: R${e.Preco} | Nº Série: {e.NumeroSerie} | Data Fab.: {e.DataFabricacao.ToShortDateString()} | Fabricante: {e.Fabricante}");
-                }
+                foreach (var e in lista)
+                    e.ExibirInformacoes();
             }
 
             Console.ReadLine();
@@ -92,27 +102,39 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
             Console.WriteLine("---- Edição de Equipamento ----");
             Listar();
 
-            Console.Write("Digite o ID do equipamento que deseja editar: ");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.Write("Digite o ID do equipamento que deseja editar: ");
+                int id = int.Parse(Console.ReadLine());
 
-            Console.Write("Novo Nome: ");
-            string nome = Console.ReadLine();
+                Console.Write("Novo Nome: ");
+                string nome = Console.ReadLine();
 
-            Console.Write("Novo Preço: ");
-            decimal preco = decimal.Parse(Console.ReadLine());
+                Console.Write("Novo Preço: ");
+                decimal preco = decimal.Parse(Console.ReadLine());
 
-            Console.Write("Novo Número de Série: ");
-            string numeroSerie = Console.ReadLine();
+                Console.Write("Novo Nº de Série: ");
+                string numeroSerie = Console.ReadLine();
 
-            Console.Write("Nova Data de Fabricação (dd/MM/yyyy): ");
-            DateTime dataFabricacao = DateTime.Parse(Console.ReadLine());
+                Console.Write("Nova Data de Fabricação (dd/MM/yyyy): ");
+                DateTime dataFabricacao = DateTime.Parse(Console.ReadLine());
 
-            Console.Write("Novo Fabricante: ");
-            string fabricante = Console.ReadLine();
+                Console.Write("Novo Fabricante: ");
+                string fabricante = Console.ReadLine();
 
-            RepositorioEquipamento.Editar(id, nome, preco, numeroSerie, dataFabricacao, fabricante);
+                Equipamento atualizado = new Equipamento(id, nome, preco, numeroSerie, dataFabricacao, fabricante);
+                repositorio.Editar(id, atualizado);
 
-            Console.WriteLine("Equipamento atualizado com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Equipamento atualizado com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
         }
 
@@ -122,13 +144,31 @@ namespace Academia_Programador_GestaoEquipamentosFabricantes.ModuloEquipamento
             Console.WriteLine("---- Exclusão de Equipamento ----");
             Listar();
 
-            Console.Write("Digite o ID do equipamento que deseja excluir: ");
-            int id = int.Parse(Console.ReadLine());
+            try
+            {
+                Console.Write("Digite o ID do equipamento que deseja excluir: ");
+                int id = int.Parse(Console.ReadLine());
 
-            RepositorioEquipamento.Remover(id);
+                repositorio.Excluir(id);
 
-            Console.WriteLine("Equipamento removido com sucesso!");
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Equipamento removido com sucesso!");
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Erro: {ex.Message}");
+            }
+
+            Console.ResetColor();
             Console.ReadLine();
+        }
+
+        private static int GerarNovoId()
+        {
+            var lista = repositorio.ListarTodos();
+            if (lista.Count == 0) return 1;
+            return lista[^1].Id + 1;
         }
     }
 }
