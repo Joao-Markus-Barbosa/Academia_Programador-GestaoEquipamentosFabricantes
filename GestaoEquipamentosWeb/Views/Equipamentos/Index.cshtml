@@ -1,0 +1,42 @@
+﻿@model IEnumerable<GestaoEquipamentosWeb.Domain.Entities.Equipamento>
+
+@{
+    ViewData["Title"] = "Lista de Equipamentos";
+}
+
+<h2 class="text-white mt-4">@ViewData["Title"]</h2>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">Novo Equipamento</a>
+</p>
+
+<table class="table table-dark table-striped mt-3">
+    <thead>
+        <tr>
+            <th>Nome</th>
+            <th>Número de Série</th>
+            <th>Data de Aquisição</th>
+            <th>Fabricante</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var equipamento in Model)
+        {
+            <tr>
+                <td>@equipamento.Nome</td>
+                <td>@equipamento.NumeroSerie</td>
+                <td>@equipamento.DataAquisicao.ToShortDateString()</td>
+                <td>@equipamento.Fabricante?.Nome</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@equipamento.Id" class="btn btn-sm btn-warning me-2">Editar</a>
+                    <a asp-action="Delete" asp-route-id="@equipamento.Id" class="btn btn-sm btn-danger">Excluir</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+
+

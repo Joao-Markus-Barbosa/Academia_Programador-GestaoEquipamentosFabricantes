@@ -1,0 +1,45 @@
+﻿@model GestaoEquipamentosWeb.Domain.Entities.Chamado
+
+@{
+    ViewData["Title"] = "Editar Chamado";
+}
+
+<h2 class="text-white mt-4">Editar Chamado</h2>
+
+<form asp-action="Edit" method="post" class="text-white">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="form-group mt-3">
+        <label asp-for="Titulo"></label>
+        <input asp-for="Titulo" class="form-control" />
+        <span asp-validation-for="Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <label asp-for="Descricao"></label>
+        <textarea asp-for="Descricao" class="form-control"></textarea>
+        <span asp-validation-for="Descricao" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <label asp-for="DataAbertura"></label>
+        <input asp-for="DataAbertura" type="date" class="form-control" />
+        <span asp-validation-for="DataAbertura" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mt-3">
+        <label asp-for="EquipamentoId">Equipamento</label>
+        <select asp-for="EquipamentoId" asp-items="ViewBag.Equipamentos" class="form-control"></select>
+        <span asp-validation-for="EquipamentoId" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Salvar</button>
+    <a asp-action="Index" class="btn btn-secondary mt-4">Voltar</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+

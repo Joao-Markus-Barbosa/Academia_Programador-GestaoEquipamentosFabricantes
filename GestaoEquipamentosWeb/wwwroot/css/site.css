@@ -1,0 +1,55 @@
+/* Estilo geral dark com roxo */
+
+body {
+    background-color: #121212;
+    color: #ffffff;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+    color: #a64dff;
+}
+
+.navbar {
+    background-color: #1a1a1a;
+    border-bottom: 2px solid #a64dff;
+}
+
+.nav-link,
+.navbar-brand {
+    color: white !important;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+}
+
+.btn-primary, .btn-success {
+    background-color: #8000ff;
+    border: none;
+}
+
+.btn-secondary {
+    background-color: #444;
+    color: white;
+    border: 1px solid #a64dff;
+}
+
+.btn:hover {
+    background-color: #a64dff;
+    transition: 0.3s ease;
+}
+
+.form-control {
+    background-color: #1e1e1e;
+    color: white;
+    border: 1px solid #8000ff;
+}
+
+label {
+    color: #cccccc;
+}
+
+.text-danger {
+    color: #ff4d4d;
+}

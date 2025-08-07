@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Remove="DataStorage\chamados.json" />
+    <Content Remove="DataStorage\equipamentos.json" />
+    <Content Remove="DataStorage\fabricantes.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="DataStorage\chamados.json" />
+    <None Include="DataStorage\equipamentos.json" />
+    <None Include="DataStorage\fabricantes.json" />
+  </ItemGroup>
+
+</Project>

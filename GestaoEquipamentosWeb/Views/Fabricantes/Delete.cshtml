@@ -1,0 +1,28 @@
+﻿@model GestaoEquipamentosWeb.Domain.Entities.Fabricante
+
+@{
+    ViewData["Title"] = "Excluir Fabricante";
+}
+
+<h2 class="text-white mt-4">Deseja excluir este fabricante?</h2>
+
+<div class="text-white mt-4">
+    <dl class="row">
+        <dt class="col-sm-2">Nome</dt>
+        <dd class="col-sm-10">@Model.Nome</dd>
+
+        <dt class="col-sm-2">Telefone</dt>
+        <dd class="col-sm-10">@Model.Telefone</dd>
+
+        <dt class="col-sm-2">E-mail</dt>
+        <dd class="col-sm-10">@Model.Email</dd>
+    </dl>
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Excluir</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+
