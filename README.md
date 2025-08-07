@@ -113,7 +113,7 @@ Este projeto foi desenvolvido como parte das atividades da **Academia do Program
 - Nenhum banco de dados é utilizado: os dados são armazenados temporariamente em listas.
 - Ideal para estudantes que estão aprendendo os fundamentos da programação orientada a objetos em C#.
 
-
+![Fluxo de sucesso](./GestaoEquipamentosWeb/gestaoequipamentos.gif)
 ---
 
 
